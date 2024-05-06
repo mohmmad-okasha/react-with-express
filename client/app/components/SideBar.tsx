@@ -1,5 +1,5 @@
 import { Menu, MenuProps, theme } from "antd";
-import styles from"./SideBar.css"
+import styles from"./styles.css"
 import Sider from "antd/es/layout/Sider";
 import React, { useState } from "react";
 import {
