@@ -38,6 +38,30 @@ app.post('/users', async (request, response) => {
     response.send("ok")
 })
 
+app.put('/users', async (request, response) => {
+    try {
+        const id = request.body._id;
+        const name = request.body.name;
+        console.log(request.body)
+        const {  email, age } = request.body;
+return
+        const updatedUser = await User.findByIdAndUpdate(id, {
+            name,
+            email,
+            age
+        }, { new: true }); // Return the updated document
+
+        if (!updatedUser) {
+            return res.status(404).send('User not found');
+        }
+
+        response.json(updatedUser);
+    } catch (err) {
+        console.error('Error updating user:', err);
+        response.status(500).send('Error updating user');
+    }
+});
+
 app.delete('/users/:id', async (request, response) => {
     const { id } = request.params;
     console.log(id)

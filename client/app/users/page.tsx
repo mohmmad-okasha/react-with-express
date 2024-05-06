@@ -42,12 +42,14 @@ const remove = (id: string) => {
 
 export default function App() {
   const [users, setUsers] = useState([]);
+  const [id, setID] = useState("");
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [roles, setroles] = useState("");
   const [Loading, setLoading] = useState(true); // to show loading before get data form db
   const [form] = Form.useForm(); // to reset form after save or close
+  const [edit, setEdit] = useState(false); // if true update else save new
 
   const columns: TableColumnsType<DataType> = [
     {
@@ -92,7 +94,22 @@ export default function App() {
             />
           </Popconfirm>
           <> </>
-          <Button type="primary" shape="circle" icon={<EditOutlined />} />
+          <Button
+            type="primary"
+            shape="circle"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setID(record._id);
+              form.setFieldsValue({
+                name: record.name,
+                email: record.email,
+                password: record.password,
+                roles: record.roles,
+              });
+              setEdit(true);
+              showModal();
+            }}
+          />
         </>
       ),
     },
@@ -116,21 +133,40 @@ export default function App() {
     });
   };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const update = () => {
+    Axios.put(`${api}/users`, {
+      _id: id,
+      name: form.getFieldValue('name'),
+      email: form.getFieldValue('email'),
+      password: form.getFieldValue('password'),
+      roles: form.getFieldValue('roles'),
+    }).then((res) => {
+      console.log("updated");
+    });
+    setEdit(false);
+  };
 
   // Modal //////////
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
 
   const handleOk = async () => {
-    await save();
+    if (!edit) {
+      await save();
+    } else {
+      await update();
+    }
+
     setIsModalOpen(false);
     form.resetFields();
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setEdit(false);
     form.resetFields();
   };
   //////////////////
@@ -149,11 +185,6 @@ export default function App() {
   const confirmRemove = (id: string) => {
     remove(id);
     message.success("Removed");
-  };
-
-  const cancelRemove: PopconfirmProps["onCancel"] = (e) => {
-    console.log(e);
-    message.error("Click on No");
   };
 
   return (
@@ -181,7 +212,7 @@ export default function App() {
             validateMessages={validateMessages}
             onFinish={handleOk}
           >
-            <Form.Item label="Name" name="Name" rules={[{ required: true }]}>
+            <Form.Item label="Name" name="name" rules={[{ required: true }]}>
               <Input
                 onChange={(e) => {
                   setname(e.target.value);
@@ -190,7 +221,7 @@ export default function App() {
             </Form.Item>
             <Form.Item
               label="Email"
-              name="Email"
+              name="email"
               rules={[
                 {
                   type: "email",
@@ -206,7 +237,7 @@ export default function App() {
             </Form.Item>
             <Form.Item
               label="Password"
-              name="Password"
+              name="password"
               rules={[{ required: true }]}
             >
               <Input.Password
@@ -215,7 +246,7 @@ export default function App() {
                 }}
               />
             </Form.Item>
-            <Form.Item label="Roles" name="Roles" rules={[{ required: true }]}>
+            <Form.Item label="Roles" name="roles" rules={[{ required: true }]}>
               <Input
                 onChange={(e) => {
                   setroles(e.target.value);
@@ -228,7 +259,8 @@ export default function App() {
             <Form.Item style={{ marginBottom: -10, textAlign: "right" }}>
               <Button onClick={handleCancel} icon={<CloseOutlined />} />
               <> </>
-              <Button
+
+              <Button //if edit === true hide this button
                 type="primary"
                 htmlType="submit"
                 icon={<SaveOutlined />}
@@ -242,7 +274,12 @@ export default function App() {
         title={PageName}
         extra={<Button onClick={showModal} icon={<PlusOutlined />}></Button>}
       >
-        <Table columns={columns} dataSource={users} loading={Loading} scroll={{ x: 'calc(700px + 50%)', y: 240 }}/>
+        <Table
+          columns={columns}
+          dataSource={users}
+          loading={Loading}
+          scroll={{ x: "calc(700px + 50%)", y: 240 }}
+        />
       </Card>
     </>
   );
