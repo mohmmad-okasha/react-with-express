@@ -41,14 +41,14 @@ app.post('/users', async (request, response) => {
 app.put('/users', async (request, response) => {
     try {
         const id = request.body._id;
-        const name = request.body.name;
-        console.log(request.body)
-        const {  email, age } = request.body;
-return
-        const updatedUser = await User.findByIdAndUpdate(id, {
+        
+        const { name, email, password,roles } = request.body;
+
+        const updatedUser = await userModel.findByIdAndUpdate(id, {
             name,
             email,
-            age
+            password,
+            roles
         }, { new: true }); // Return the updated document
 
         if (!updatedUser) {
