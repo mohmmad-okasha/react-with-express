@@ -1,0 +1,3 @@
+:where(.css-dev-only-do-not-override-kghr11).ant-menu-dark .ant-menu-item-selected, :where(.css-dev-only-do-not-override-kghr11).ant-menu-dark>.ant-menu .ant-menu-item-selected {
+    background-color: #000;
+  } 

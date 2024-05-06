@@ -1,0 +1,22 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build",
+			"path": "client",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build - client",
+			"detail": "next build"
+		},
+		{
+			"type": "npm",
+			"script": "start",
+			"path": "server",
+			"problemMatcher": [],
+			"label": "npm: start - server",
+			"detail": "nodemon app.js"
+		}
+	]
+}
