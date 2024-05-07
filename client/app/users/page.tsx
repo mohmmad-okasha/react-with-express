@@ -8,10 +8,11 @@ import {
   Input,
   Modal,
   Popconfirm,
-  PopconfirmProps,
+  Result,
   Table,
   TableColumnsType,
   message,
+  notification,
 } from "antd";
 import {
   DeleteOutlined,
@@ -21,6 +22,7 @@ import {
   CloseOutlined,
 } from "@ant-design/icons";
 import Axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 const PageName = "Users";
 const api = "http://localhost:3001";
 
@@ -33,13 +35,6 @@ interface DataType {
   roles?: string;
 }
 
-const remove = (id: string) => {
-  console.log(id);
-  Axios.delete(`${api}/users/${id}`).then((res) => {
-    console.log(id, res.data);
-  });
-};
-
 export default function App() {
   const [users, setUsers] = useState([]);
   const [id, setID] = useState("");
@@ -50,6 +45,8 @@ export default function App() {
   const [Loading, setLoading] = useState(true); // to show loading before get data form db
   const [form] = Form.useForm(); // to reset form after save or close
   const [edit, setEdit] = useState(false); // if true update else save new
+  const [searchText, setSearchText] = useState(""); // to search on table
+  const [errors, setErrors] = useState(); // if connection error  save here
 
   const columns: TableColumnsType<DataType> = [
     {
@@ -115,12 +112,55 @@ export default function App() {
     },
   ];
 
+  let toastInstance: any = null; // to show 1 toast message only
+
   useEffect(() => {
-    Axios.get(`${api}/users`).then(async (res) => {
-      setUsers(res.data);
-      setLoading(false); // stop loading and show data
-    });
-  }, [users]);
+    setLoading(true);
+    Axios.get(`${api}/users`)
+      .then(async (res) => {
+        setUsers(res.data);
+        setLoading(false); // stop loading and show data
+      })
+      .catch((error) => {
+        setErrors(error.response.status);
+        if (!toastInstance) {
+          // Create toast only if there isn't one already
+          toastInstance = toast.error(
+            "Error " + error.response.status || "Unknown error",
+            {
+              position: "top-center",
+              style: {
+                width: "100%",
+              },
+            }
+          );
+          setLoading(false);
+        }
+      });
+  }, []);
+
+  const getData = async () => {
+    setLoading(true);
+    try {
+      const response = await Axios.get(`${api}/users`);
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredData = users.filter((user) => {
+    // Implement your search logic here
+    const searchTextLower = searchText.toLowerCase(); // Case-insensitive search
+    return (
+      // Search relevant fields
+      user.name.toLowerCase().includes(searchTextLower) ||
+      user.email.toLowerCase().includes(searchTextLower)
+      // Add more fields as needed based on your data structure
+    );
+  });
 
   const save = () => {
     Axios.post(`${api}/users`, {
@@ -129,26 +169,38 @@ export default function App() {
       password: password,
       roles: roles,
     }).then((res) => {
-      console.log("added");
+      toast.success("Added.", {
+        position: "top-center",
+      });
+      getData();
     });
   };
 
   const update = () => {
     Axios.put(`${api}/users`, {
       _id: id,
-      name: form.getFieldValue('name'),
-      email: form.getFieldValue('email'),
-      password: form.getFieldValue('password'),
-      roles: form.getFieldValue('roles'),
+      name: form.getFieldValue("name"),
+      email: form.getFieldValue("email"),
+      password: form.getFieldValue("password"),
+      roles: form.getFieldValue("roles"),
     }).then((res) => {
-      console.log("updated");
+      toast.success("Updated.", {
+        position: "top-center",
+      });
+      getData();
     });
     setEdit(false);
   };
 
+  const remove = (id: string) => {
+    console.log(id);
+    Axios.delete(`${api}/users/${id}`).then((res) => {
+      getData();
+    });
+  };
+
   // Modal //////////
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -189,6 +241,9 @@ export default function App() {
 
   return (
     <>
+      <div>
+        <Toaster />
+      </div>
       <Modal
         title={"Add " + PageName.slice(0, -1)}
         open={isModalOpen}
@@ -274,12 +329,27 @@ export default function App() {
         title={PageName}
         extra={<Button onClick={showModal} icon={<PlusOutlined />}></Button>}
       >
-        <Table
-          columns={columns}
-          dataSource={users}
-          loading={Loading}
-          scroll={{ x: "calc(700px + 50%)", y: 240 }}
-        />
+        {!errors && (
+          <Table
+            columns={columns}
+            dataSource={filteredData}
+            loading={Loading}
+            pagination={{ pageSize: 5 }}
+            scroll={{ x: "calc(300px + 50%)", y: 500 }}
+            rowKey={(record) => record._id}
+          >
+            <Input.Search
+              placeholder="Search..."
+              onChange={(e) => setSearchText(e.target.value)}
+              style={{ paddingBottom: 5 }}
+              allowClear
+            />
+          </Table>
+        )}
+
+        {errors && (
+          <Result status="warning" title={"Can't Load Data :" + errors} />
+        )}
       </Card>
     </>
   );
