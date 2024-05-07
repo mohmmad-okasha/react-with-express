@@ -1,3 +1,7 @@
-:where(.css-dev-only-do-not-override-kghr11).ant-menu-dark .ant-menu-item-selected, :where(.css-dev-only-do-not-override-kghr11).ant-menu-dark>.ant-menu .ant-menu-item-selected {
+:where(.css-dev-only-do-not-override-1okl62o).ant-menu-dark .ant-menu-item-selected, :where(.css-dev-only-do-not-override-1okl62o).ant-menu-dark>.ant-menu .ant-menu-item-selected{
     background-color: #001529;
   } 
+
+  :where(.css-dev-only-do-not-override-1okl62o).ant-menu-dark .ant-menu-item-selected, :where(.css-dev-only-do-not-override-1okl62o).ant-menu-dark>.ant-menu .ant-menu-item-selected {
+    color: #fff;
+}

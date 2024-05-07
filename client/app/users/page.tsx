@@ -330,6 +330,13 @@ export default function App() {
         extra={<Button onClick={showModal} icon={<PlusOutlined />}></Button>}
       >
         {!errors && (
+          <>
+          <Input.Search
+              placeholder="Search..."
+              onChange={(e) => setSearchText(e.target.value)}
+              style={{ paddingBottom: 5 }}
+              allowClear
+            />
           <Table
             columns={columns}
             dataSource={filteredData}
@@ -338,13 +345,11 @@ export default function App() {
             scroll={{ x: "calc(300px + 50%)", y: 500 }}
             rowKey={(record) => record._id}
           >
-            <Input.Search
-              placeholder="Search..."
-              onChange={(e) => setSearchText(e.target.value)}
-              style={{ paddingBottom: 5 }}
-              allowClear
-            />
+            
           </Table>
+
+          </>
+
         )}
 
         {errors && (

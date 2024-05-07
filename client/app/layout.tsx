@@ -6,7 +6,7 @@ import SideBar from "./components/SideBar";
 import NavBar from "./components/NavBar";
 import Login from "./login/page";
 
-import { Layout, theme } from "antd";
+import { ConfigProvider, Layout, theme } from "antd";
 import { useState } from "react";
 
 const { Content, Footer } = Layout;
@@ -34,6 +34,7 @@ export default function RootLayout({
       <body className={inter.className}>
         {!Authed && <Login />}
         {Authed && (
+          <ConfigProvider >
           <Layout hasSider style={{ minHeight: "100vh" }}>
             <SideBar />
 
@@ -56,6 +57,7 @@ export default function RootLayout({
               </Footer>
             </Layout>
           </Layout>
+          </ConfigProvider>
         )}
       </body>
     </html>

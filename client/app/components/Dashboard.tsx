@@ -11,7 +11,7 @@ export default function app() {
             bordered={true}
             style={{
               fontSize: "25px",
-              backgroundColor: "#4D869C",
+              backgroundColor: '#001529', //"#4D869C",
               color: "white",
             }}
           >
