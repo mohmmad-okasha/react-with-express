@@ -10,12 +10,17 @@ router.get('/', async (request, response) => {
 });
 
 router.post('/', async (request, response) => {
+
+    const { name, password } = request.body
+    const finded = await userModel.findOne({ name }) // search if name exist
+    if (finded) return (response.json({ message: finded.name + ' Already Exist!' }))
+
     const newUser = new userModel({
         _id: new global.db.Types.ObjectId(), // to generate a value for id
         ...request.body, //to get all data from request.body
     })
     await newUser.save()
-    response.send("ok")
+    response.json({ message:'Saved!' })
 })
 
 router.put('/', async (request, response) => {

@@ -169,10 +169,16 @@ export default function App() {
       password: password,
       roles: roles,
     }).then((res) => {
-      toast.success("Added.", {
-        position: "top-center",
-      });
-      getData();
+      if (res.data.message === "Saved!") {
+        toast.success(res.data.message, {
+          position: "top-center",
+        });
+        getData();
+      }else{
+        toast.error(res.data.message, {
+          position: "top-center",
+        });
+      }
     });
   };
 
@@ -331,25 +337,21 @@ export default function App() {
       >
         {!errors && (
           <>
-          <Input.Search
+            <Input.Search
               placeholder="Search..."
               onChange={(e) => setSearchText(e.target.value)}
               style={{ paddingBottom: 5 }}
               allowClear
             />
-          <Table
-            columns={columns}
-            dataSource={filteredData}
-            loading={Loading}
-            pagination={{ pageSize: 5 }}
-            scroll={{ x: "calc(300px + 50%)", y: 500 }}
-            rowKey={(record) => record._id}
-          >
-            
-          </Table>
-
+            <Table
+              columns={columns}
+              dataSource={filteredData}
+              loading={Loading}
+              pagination={{ pageSize: 5 }}
+              scroll={{ x: "calc(300px + 50%)", y: 500 }}
+              rowKey={(record) => record._id}
+            ></Table>
           </>
-
         )}
 
         {errors && (
