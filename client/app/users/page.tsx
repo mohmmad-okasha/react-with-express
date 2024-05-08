@@ -162,40 +162,76 @@ export default function App() {
     );
   });
 
-  const save = () => {
-    Axios.post(`${api}/users`, {
+  // const save = async () => {
+  //   Axios.post(`${api}/users`, {
+  //     name: name,
+  //     email: email,
+  //     password: password,
+  //     roles: roles,
+  //   }).then((res) => {
+  //     if (res.data.message === "Saved!") {
+  //       toast.success(res.data.message, {
+  //         position: "top-center",
+  //       });
+  //       getData();
+  //     }else{
+  //       toast.error(res.data.message, {
+  //         position: "top-center",
+  //       });
+  //     }
+  //   });
+  // };
+
+  const save = async () => {
+    const response = await Axios.post(`${api}/users`, {
       name: name,
       email: email,
       password: password,
       roles: roles,
-    }).then((res) => {
-      if (res.data.message === "Saved!") {
-        toast.success(res.data.message, {
-          position: "top-center",
-        });
-        getData();
-      }else{
-        toast.error(res.data.message, {
-          position: "top-center",
-        });
-      }
     });
+
+    if (response.data.message === "Saved!") {
+      getData();
+      toast.remove();// remove any message on screen
+      toast.success(response.data.message, {
+        position: "top-center",
+      });
+      return true; // to close modal form
+    } else {
+      toast.remove();
+      toast.error(response.data.message, {
+        position: "top-center",
+      });
+      return false; // to keep modal form open
+    }
   };
 
-  const update = () => {
-    Axios.put(`${api}/users`, {
+  const update = async () => {
+    const  response = await Axios.put(`${api}/users`, {
       _id: id,
       name: form.getFieldValue("name"),
       email: form.getFieldValue("email"),
       password: form.getFieldValue("password"),
       roles: form.getFieldValue("roles"),
-    }).then((res) => {
-      toast.success("Updated.", {
+    });
+
+    if (response.data.message === "Updated!") {
+      getData();
+      toast.remove();
+      toast.success(response.data.message, {
         position: "top-center",
       });
-      getData();
-    });
-    setEdit(false);
+      setEdit(false);
+      return true; // to close modal form
+    } else {
+      toast.remove();
+      toast.error(response.data.message, {
+        position: "top-center",
+      });
+      return false; // to keep modal form open
+    }
+
+    
   };
 
   const remove = (id: string) => {
@@ -213,13 +249,16 @@ export default function App() {
 
   const handleOk = async () => {
     if (!edit) {
-      await save();
+      if (await save()) {
+        setIsModalOpen(false);
+        form.resetFields();
+      }
     } else {
-      await update();
+      if (await update()) {
+        setIsModalOpen(false);
+        form.resetFields();
+      }
     }
-
-    setIsModalOpen(false);
-    form.resetFields();
   };
 
   const handleCancel = () => {

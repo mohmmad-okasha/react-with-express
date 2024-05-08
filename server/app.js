@@ -10,7 +10,6 @@ const app = express()
 app.use(cors())// for db connection
 app.use(express.json())//to receive json data
 
-
 //connect to DB
 const
     user_name = "swpl",
@@ -27,19 +26,9 @@ import usersRouter from './routes/users.js';
 app.use('/users', usersRouter);
 
 
-
-
-
-
-
-
-
-
-
 app.listen(port, () => {
     console.log(`running on ${port}`);
 });
-
 
 
 //MongoDB swpl 123456sw

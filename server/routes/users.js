@@ -1,4 +1,6 @@
 import express from "express"
+import bcrypt from "bcrypt"
+
 const router = express.Router(); // Create a router instance
 
 //import users model file
@@ -17,10 +19,14 @@ router.post('/', async (request, response) => {
 
     const newUser = new userModel({
         _id: new global.db.Types.ObjectId(), // to generate a value for id
-        ...request.body, //to get all data from request.body
+        password: bcrypt.hashSync(request.body.password,10) , // to hash the password
+        name: request.body.name ,
+        roles: request.body.roles ,
+        email: request.body.email ,
+       // ...request.body, //to get all data from request.body
     })
     await newUser.save()
-    response.json({ message:'Saved!' })
+    response.json({ message: 'Saved!' })
 })
 
 router.put('/', async (request, response) => {
@@ -28,6 +34,9 @@ router.put('/', async (request, response) => {
         const id = request.body._id;// get id for updated record
 
         const { name, email, password, roles } = request.body;//get the new data
+        const finded = await userModel.findOne({ name }) // search if name exist
+        if (finded) return (response.json({ message: finded.name + ' Already Exist!' }))
+
 
         const updatedUser = await userModel.findByIdAndUpdate(id, {
             name,
@@ -37,13 +46,13 @@ router.put('/', async (request, response) => {
         }, { new: true }); // Return the updated document
 
         if (!updatedUser) {
-            return res.status(404).send('User not found');
+            response.json({ message: 'User not found!' })
         }
 
-        response.json(updatedUser);
+        response.json({ message: 'Updated!' })
+
     } catch (err) {
-        console.error('Error updating user:', err);
-        response.status(500).send('Error updating user');
+        response.json({ message: 'Error updating user: ', err })
     }
 });
 
