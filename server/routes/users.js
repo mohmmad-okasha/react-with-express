@@ -35,13 +35,13 @@ router.put('/', async (request, response) => {
 
         const { name, email, password, roles } = request.body;//get the new data
         const finded = await userModel.findOne({ name }) // search if name exist
-        if (finded) return (response.json({ message: finded.name + ' Already Exist!' }))
+        //if (finded) return (response.json({ message: finded.name + ' Already Exist!' }))
 
 
         const updatedUser = await userModel.findByIdAndUpdate(id, {
             name,
             email,
-            password,
+            password:bcrypt.hashSync(password,10),
             roles
         }, { new: true }); // Return the updated document
 

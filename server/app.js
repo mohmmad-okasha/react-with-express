@@ -21,9 +21,11 @@ global.db = mongoose;//to access db connection from other files
 
 //Import routes
 import usersRouter from './routes/users.js';
+import loginRouter from './routes/login.js';
 
 //use routes
 app.use('/users', usersRouter);
+app.use('/login', loginRouter);
 
 
 app.listen(port, () => {
