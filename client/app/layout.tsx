@@ -6,7 +6,8 @@ import NavBar from "./components/NavBar";
 import Login from "./login/page";
 
 import { ConfigProvider, Layout, theme } from "antd";
-import { useState } from "react";
+import { useCookies } from "react-cookie";
+import { useEffect, useState } from "react";
 
 const { Content, Footer } = Layout;
 
@@ -17,13 +18,19 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const [Authed, setAuthed] = useState(true);
+  const [Authed, setAuthed] = useState('');
+  const [cookies,setCookies] = useCookies(["token"])
+
+  useEffect(()=>{
+    if(cookies.token) setAuthed('true')
+      else setAuthed('false')
+  },[cookies.token])
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        {!Authed && <Login />}
-        {Authed && (
+        {Authed==='false' && <Login />}
+        {Authed==='true' && 
           <ConfigProvider>
             <Layout hasSider style={{ minHeight: "100vh" }}>
               <SideBar />
@@ -48,7 +55,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               </Layout>
             </Layout>
           </ConfigProvider>
-        )}
+        }
       </body>
     </html>
   );
