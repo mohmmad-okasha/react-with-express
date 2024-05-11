@@ -41,7 +41,12 @@ export default function RootLayout({
       <body className={inter.className}>
         {Authed === "false" && <Login />}
         {Authed === "true" && (
-          <ConfigProvider>
+          <ConfigProvider
+            theme={{
+              // 1. Use dark algorithm
+              algorithm: theme.defaultAlgorithm, //defaultAlgorithm
+            }}
+          >
             <Layout hasSider style={{ minHeight: "100vh" }}>
               <SideBar />
 
@@ -53,26 +58,28 @@ export default function RootLayout({
                     padding: 24,
                     margin: 0,
                     minHeight: 280,
-                    background: colorBgContainer,
+                    //background: colorBgContainer,
                     borderRadius: borderRadiusLG,
                   }}
                 >
                   {loading && (
                     <>
-                    <Flex
-                      style={{ minHeight: "100%" }}
-                      gap="center"
-                      align="center"
-                      justify="center"
-                      vertical
-                    >
-                      <Spin tip="Loading" size="large" style={{ fontSize: "15vh" }}></Spin>
-                      
-                    </Flex>
-                    <div style={{display: 'none'}}>{children}</div>
+                      <Flex
+                        style={{ minHeight: "100%" }}
+                        gap="center"
+                        align="center"
+                        justify="center"
+                        vertical
+                      >
+                        <Spin
+                          tip="Loading"
+                          size="large"
+                          style={{ fontSize: "15vh" }}
+                        ></Spin>
+                      </Flex>
+                      <div style={{ display: "none" }}>{children}</div>
                     </>
                   )}
-                  
                   {!loading && children} {/* content will show here */}
                 </Content>
                 <Footer style={{ textAlign: "center" }}>
