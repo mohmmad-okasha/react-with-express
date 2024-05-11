@@ -13,11 +13,13 @@ import {
 } from "@ant-design/icons";
 
 import { useRouter } from "next/navigation";
+import { useCookies } from "react-cookie";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
 export default function App() {
   const router = useRouter();
+  const [_, setCookies] = useCookies(["loading"]);//for loading page
 
   const items: MenuItem[] = [
     {
@@ -34,6 +36,7 @@ export default function App() {
       label: "Users",
       onClick: () => {
         router.push("/users");
+        setCookies('loading',true)
       },
     },
     { key: "3", icon: <ContainerOutlined />, label: "Option 3" },

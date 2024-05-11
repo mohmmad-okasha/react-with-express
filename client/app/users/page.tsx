@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Button,
   Card,
   Divider,
@@ -23,6 +24,7 @@ import {
 } from "@ant-design/icons";
 import Axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { useCookies } from "react-cookie";
 const PageName = "Users";
 const api = "http://localhost:3001";
 
@@ -46,7 +48,9 @@ export default function App() {
   const [form] = Form.useForm(); // to reset form after save or close
   const [edit, setEdit] = useState(false); // if true update else save new
   const [searchText, setSearchText] = useState(""); // to search on table
-  const [errors, setErrors] = useState(); // if connection error  save here
+  const [errors, setErrors] = useState(); // if connection error save here
+  const [saveErrors, setSaveErrors] = useState(''); 
+  const [_, setCookies] = useCookies(["loading"]);//for loading page
 
   const columns: TableColumnsType<DataType> = [
     {
@@ -115,6 +119,7 @@ export default function App() {
   let toastInstance: any = null; // to show 1 toast message only
 
   useEffect(() => {
+    setCookies("loading",false)
     setLoading(true);
     Axios.get(`${api}/users`)
       .then(async (res) => {
@@ -183,6 +188,7 @@ export default function App() {
   // };
 
   const save = async () => {
+    setSaveErrors('')
     const response = await Axios.post(`${api}/users`, {
       name: name,
       email: email,
@@ -198,15 +204,13 @@ export default function App() {
       });
       return true; // to close modal form
     } else {
-      toast.remove();
-      toast.error(response.data.message, {
-        position: "top-center",
-      });
+      setSaveErrors(response.data.message)
       return false; // to keep modal form open
     }
   };
 
   const update = async () => {
+    setSaveErrors('')
     const  response = await Axios.put(`${api}/users`, {
       _id: id,
       name: form.getFieldValue("name"),
@@ -224,10 +228,7 @@ export default function App() {
       setEdit(false);
       return true; // to close modal form
     } else {
-      toast.remove();
-      toast.error(response.data.message, {
-        position: "top-center",
-      });
+      setSaveErrors(response.data.message)
       return false; // to keep modal form open
     }
 
@@ -244,6 +245,7 @@ export default function App() {
   // Modal //////////
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
+    setSaveErrors('')
     setIsModalOpen(true);
   };
 
@@ -367,6 +369,8 @@ export default function App() {
               />
             </Form.Item>
           </Form>
+          <br />
+          {saveErrors && < Alert description={saveErrors} type="error" showIcon />}
         </Card>
       </Modal>
 
